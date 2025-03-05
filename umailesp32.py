@@ -7,6 +7,7 @@
 import socket
 import time
 
+
 # Constants
 LOCAL_DOMAIN = '127.0.0.1'
 CMD_EHLO = 'EHLO'
@@ -96,7 +97,7 @@ class SMTP:
         if not auths:
             raise Exception("No auth methods available")
 
-        from ubinascii import b2a_base64 as b64
+        from ubinascii import b2a_base64 as b64 # type: ignore
         if AUTH_PLAIN in auths:
             cren = b64(f"\0{username}\0{password}")[:-1].decode()
             code, resp = self.cmd(f'{CMD_AUTH} {AUTH_PLAIN} {cren}')
