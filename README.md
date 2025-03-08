@@ -1,4 +1,4 @@
-uMail_ESP32 (Enhanced)
+uMail_ESP (Enhanced)
 
 A lightweight SMTP client for MicroPython, originally developed by Shawwwn and enhanced for improved reliability and functionality. This version builds on the foundation of uMail to support robust email and SMS sending (via email-to-SMS gateways) from devices like the ESP32, with no subscription services required.
 Acknowledgments
