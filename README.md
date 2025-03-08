@@ -6,7 +6,7 @@ Acknowledgments
 This project is based on the excellent work of Shawwwn from the uMail repository, released under the MIT License in 2018. The original umail.py provided a simple, effective SMTP client for MicroPython, and this fork extends it with additional features and improvements while preserving its lightweight design. Thank you, Shawwwn, for the foundational code!
 Updates and Enhancements
 
-The enhanced umailesp32.py includes the following improvements over the original:
+The enhanced umailesp.py includes the following improvements over the original:
 
     Better Error Handling:
         Replaced assert statements with raise Exception—prevents crashes and allows calling scripts to handle errors gracefully.
@@ -31,10 +31,10 @@ Requirements
 
 Installation
 
-    Download umailesp32.py from this repository.
+    Download umailesp.py from this repository.
     Upload it to your MicroPython device’s filesystem:
-        Using Thonny: File > Save As > MicroPython Device > umailesp32.py.
-        Or via ampy: ampy --port /dev/ttyUSB0 put umailesp32.py.
+        Using Thonny: File > Save As > MicroPython Device > umailesp.py.
+        Or via ampy: ampy --port /dev/ttyUSB0 put umailesp.py.
 
 Example: Sending BME280 Readings
 
