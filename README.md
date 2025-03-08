@@ -1,55 +1,51 @@
-# uMail_ESP32 (Enhanced)
+uMail_ESP32 (Enhanced)
 
-A lightweight SMTP client for MicroPython, originally developed by Shawwwn and enhanced for improved reliability and functionality. This version builds on the foundation of [uMail](https://github.com/shawwwn/uMail/) to support robust email and SMS sending (via email-to-SMS gateways) from devices like the ESP32, with no subscription services required.
+A lightweight SMTP client for MicroPython, originally developed by Shawwwn and enhanced for improved reliability and functionality. This version builds on the foundation of uMail to support robust email and SMS sending (via email-to-SMS gateways) from devices like the ESP32, with no subscription services required.
+Acknowledgments
 
-## Acknowledgments
+This project is based on the excellent work of Shawwwn from the uMail repository, released under the MIT License in 2018. The original umail.py provided a simple, effective SMTP client for MicroPython, and this fork extends it with additional features and improvements while preserving its lightweight design. Thank you, Shawwwn, for the foundational code!
+Updates and Enhancements
 
-This project is based on the excellent work of Shawwwn from the [uMail repository](https://github.com/shawwwn/uMail/tree/master), released under the MIT License in 2018. The original `umail.py` provided a simple, effective SMTP client for MicroPython, and this fork extends it with additional features and improvements while preserving its lightweight design. Thank you, Shawwwn, for the foundational code!
+The enhanced umailesp32.py includes the following improvements over the original:
 
-## Updates and Enhancements
+    Better Error Handling:
+        Replaced assert statements with raise Exception—prevents crashes and allows calling scripts to handle errors gracefully.
+        Added debug prints for all SMTP commands (e.g., SMTP: EHLO -> 250 ...)—aids troubleshooting without external tools.
+    Retry Logic:
+        Added a configurable retry mechanism in to() (default: 3 retries, 5s delay)—improves reliability over unstable Wi-Fi connections, common in battery-powered setups like the ESP32 with TP4056.
+    Configurable Timeout:
+        Introduced a timeout parameter in __init__ (default: 10s, adjustable)—allows tuning for slower networks, enhancing compatibility with real-world conditions.
+    MIME Support:
+        Added optional mime=True in send()—inserts basic MIME headers (text/plain; charset=UTF-8) for proper email formatting and future extensibility (e.g., logs or attachments).
+    Memory Optimization:
+        Optimized cmd() to return a single-string response list—reduces RAM usage slightly, critical for memory-constrained MicroPython devices like the ESP32.
+    Documentation:
+        Added comprehensive docstrings and inline comments—makes the code GitHub-friendly and maintainable for future contributors.
 
-The enhanced `umail.py` includes the following improvements over the original:
+Usage
+Requirements
 
-1. **Better Error Handling**:
-   - Replaced `assert` statements with `raise Exception`—prevents crashes and allows calling scripts to handle errors gracefully.
-   - Added debug prints for all SMTP commands (e.g., `SMTP: EHLO -> 250 ...`)—aids troubleshooting without external tools.
+    MicroPython firmware on your device (tested with v1.24.1 on ESP32; SSL support required for Gmail).
+    Wi-Fi connectivity (e.g., ESP32 in STA mode).
+    An SMTP-enabled email account (e.g., Gmail with a 16-digit app password).
 
-2. **Retry Logic**:
-   - Added a configurable retry mechanism in `to()` (default: 3 retries, 5s delay)—improves reliability over unstable Wi-Fi connections, common in battery-powered setups like the ESP32 with TP4056.
+Installation
 
-3. **Configurable Timeout**:
-   - Introduced a `timeout` parameter in `__init__` (default: 10s, adjustable)—allows tuning for slower networks, enhancing compatibility with real-world conditions.
+    Download umailesp32.py from this repository.
+    Upload it to your MicroPython device’s filesystem:
+        Using Thonny: File > Save As > MicroPython Device > umailesp32.py.
+        Or via ampy: ampy --port /dev/ttyUSB0 put umailesp32.py.
 
-4. **MIME Support**:
-   - Added optional `mime=True` in `send()`—inserts basic MIME headers (`text/plain; charset=UTF-8`) for future-proofing (e.g., attaching logs or formatted emails).
+Example: Sending BME280 Readings
 
-5. **Memory Optimization**:
-   - Optimized `cmd()` to return a single-string response list—reduces RAM usage slightly, critical for memory-constrained MicroPython devices like the ESP32.
-
-6. **Documentation**:
-   - Added a comprehensive docstring and inline comments—makes the code GitHub-friendly and maintainable for future users.
-
-## Usage
-
-### Requirements
-- MicroPython firmware on your device (tested with v1.24.1 on ESP32).
-- Wi-Fi connectivity (e.g., ESP32 with STA mode).
-- An SMTP-enabled email account (e.g., Gmail with an app password).
-
-### Installation
-1. Download `umailesp32.py` from this repository.
-2. Upload it to your MicroPython device’s filesystem (e.g., via Thonny: File > Save As > MicroPython Device > `umailesp32.py`).
-
-### Example: Sending BME280 Readings
-This example sends temperature, humidity, and pressure readings from a BME280 sensor via email and SMS, using your ESP32:
-
-```python
+This example sends temperature, humidity, and pressure readings from a BME280 sensor via email and SMS using an ESP32:
+python
 import time
 from machine import Pin, I2C
 import network
 import bme280
 import ssd1306
-import umailesp
+import umailesp32  # Note: Rename to match your file
 
 # Wi-Fi config
 SSID = "your_ssid"
@@ -57,7 +53,7 @@ PASSWORD = "your_password"
 
 # SMTP config
 SMTP_SERVER = "smtp.gmail.com"
-SMTP_PORT = 587
+SMTP_PORT = 465  # Use 465 for SSL (recommended) or 587 for STARTTLS
 SENDER_EMAIL = "your.email@gmail.com"
 SENDER_PASSWORD = "your_app_password"  # Gmail 16-digit app password
 RECIPIENT_EMAIL = "recipient@example.com"
@@ -110,9 +106,9 @@ while True:
         oled.show()
 
         if wifi_ok:
-            client = umail.SMTP(SMTP_SERVER, SMTP_PORT, ssl=True, 
-                               username=SENDER_EMAIL, password=SENDER_PASSWORD, 
-                               timeout=30)
+            client = umailesp32.SMTP(SMTP_SERVER, SMTP_PORT, ssl=True, 
+                                    username=SENDER_EMAIL, password=SENDER_PASSWORD, 
+                                    timeout=30)
             
             # Email
             subject = "BME280 Readings"
@@ -141,3 +137,21 @@ while True:
         print("Error:", e)
 
     time.sleep(3600)  # Hourly
+Notes:
+
+    Port: Changed to 465 (SSL) from 587 (STARTTLS) to match your latest working config.
+    Module Name: Updated to umailesp32—rename your file accordingly.
+    SMS Gateway: Replace 1234567890@vtext.com with your carrier’s gateway (e.g., Verizon: number@vtext.com, AT&T: number@txt.att.net).
+
+Configuration Tips
+
+    Gmail: Enable 2-factor authentication and generate an app password at Google Account Security.
+    Timeout: Increase to 30s (timeout=30) for slow networks.
+    SSL: Use port 465 with ssl=True for direct SSL (simpler); use 587 with ssl=False for STARTTLS if preferred.
+
+Contributing
+
+Feel free to fork, submit pull requests, or open issues! This project aims to remain lightweight and practical for ESP32 users.
+License
+
+MIT License, per the original uMail project. See LICENSE file for details.
